@@ -6,7 +6,7 @@ Clone the Repo, and download the data from https://www.kaggle.com/c/data-science
 
 ```
 data/
-  1. stage1_sample_submission.csv
-  2. stage1_test
+  stage1_sample_submission.csv
+  stage1_test
   stage1_train
 ```
