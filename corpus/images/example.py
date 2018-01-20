@@ -1,6 +1,7 @@
 import sklearn
 from sklearn import mixture
 from sklearn import cluster
+from .metric import Metric
 import os
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
@@ -24,13 +25,15 @@ class Example:
             masks = os.listdir(mask_dir)
             masks = [os.path.join(mask_dir, mask) for mask in masks]
             self.mask_paths = masks
-            self.mask = self.mask_paths
+            self.mask = self.combine_masks(self.mask_paths)
 
     def rgb2gray(self, rgb):
         return np.dot(rgb[...,:3], [0.299, 0.587, 0.114])
    
     def combine_masks(self, masks):
-        return np.sum(np.array([ mpimg.imread(mask) for mask in masks]), axis=0)
+        res = np.sum(np.array([ mpimg.imread(mask) for mask in masks]), axis=0)
+        res[res != 0] = 1
+        return res
    
     def nuclei_vals(self):
         flat_img = self.gray_image.reshape(-1)
@@ -38,7 +41,7 @@ class Example:
         return flat_img[flat_msk], flat_img[~flat_msk]
 
     def set_prediction(self, predictions):
-        assert predictions.shape == self.image.shape
+        assert predictions.shape == self.gray_image.shape
         self.predictions = predictions
 
     def get_csv_line(self):
@@ -58,4 +61,10 @@ class Example:
             if (b>prev+1): run_lengths.extend((b+1, 0))
             run_lengths[-1] += 1
             prev = b
-        return " ".join(str(run_lengths))
+        return " ".join([str(el) for el in run_lengths])
+
+    def compute_metric(self):
+        self.m = Metric(self.predictions, self.mask)
+        self.m.compute_metric()
+
+

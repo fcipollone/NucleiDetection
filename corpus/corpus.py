@@ -16,6 +16,12 @@ class Corpus:
     def get_list_images_and_masks(self):
         return [(ex.image, ex.mask) for ex in self.examples]
 
+    def get_list_predictions_and_masks(self):
+        return [ex.predictions for ex in self.examples], [ex.mask for ex in self.examples]
+
     def get_examples(self):
         return self.examples
 
+    def generate_result(self):
+        m = Metric(self.get_list_predictions_and_masks())
+        
